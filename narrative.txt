@@ -1,0 +1,121 @@
+Which one of you has recently went through an interview for a software developer position?
+
+Have you been asked about testing? Unit testing? Integration testing?
+How deep went the interviewer?
+Were they asking questions about maintaining tests or just creating tests?
+Were they asking about solutions different that unit testing at all?
+
+How many projects have you been in that unit tests have had covered more than 80% of the production codebase?
+How many problems were discovered by manual tests? What was the nature of those problems?
+
+Testing is hard. It is a necessary evil in the process of developing software. It is however funny how non-developers perceive testing.
+And yes, that includes manual testers or the so called quality engineers as well!
+
+To actually start digging into what and how to test we need to first understand why we do tests.
+
+The primary reason for testing is... to deliver bug-free software to our beloved clients. If a client sees a feature in the application they didn't order
+or if they see a feature working differently than it was originaly foreseen then they say it is a bug. Plain and simple. There are SLAs governing how screwed
+you are as a software vendor and how fast you need to react to reports about those bugs.
+
+Some SLAs are really funny (24 for any bugfix :D) - in those cases you better spend enough time validating that the end productis actually bug-free.
+On the other hand other SLAs make a difference between critical system failures and minor or trivial bugs. In those cases slipping here and there a little bit
+won't mean the end of the world. In fact if you react promptly and squash the bugs swiftly it might even earn you reputation points with the client which is
+good for business! It keeps the interaction with the client alive!
+
+So let's assume you have one of those captain tight-pants projects where if you are cought with a bug between your ankles you're basically screwed. Your family
+(if you have one) won't see any of you for the next few days when you frantically try to solve the problem. The more you dig in into the matter the more
+frustrated you will become and the more interesting your position will become.
+
+So tests are there to make sure you don't have to do the afterwork. That is their purpose.
+
+But does that mean the client needs them? Does it mean that the client will pay for a bunch of code (which is not seldom that the testing code outweighs the actual
+production codebase) that is basically saving your ass - not theirs. Of course not! So we try to sneak that under the cover of quality, we're comparing software
+vendors to car vendors and say things like "Would you rather buy a BMW or a TATA?" or "We are professional company we deliver quality and that comes at a price".
+
+All we are really trying to say is "dear client you have to pay extra because developers need to be checked if they do good job or not - believe it!".
+It has nothing to do with us not having good will to create bug-free software. In contrary! Sometimes the requirements change so often we don't even know what
+the end effect should at all look like! On top of that add lack of proper software development principles such as SOLID or DRY and the recipe for disaster is complete.
+
+So we know we have to do tests. But which ones? When? Is the holy grail really 100% unit test coverage?
+
+Let's first list all the categories of tests we have and the technologies to do them:
+
+1. Unit tests - written in all kinds of xUnit-type frameworks. Unit tests are tests that test one thing at a time and defintelly don't cross process boundaries.
+   This means that if, let's say a class has a dependency on something else than the execution unit under test it needs to be mocked.
+   In fact we as a spiecies have become so proficient at mocking things it's like second nature to us. With that tool in hand we can unit-test the world!
+2. Integration tests - written in all kinds of xUnit-type frameworks. Those tests are like unit tests but we don't do mocking as much as we did with unit tests.
+   This means that we're actually exercising different parts of the system in integration to test if the assumed low-level scenarios work.
+   Historically this is the way backend is tested via some kind of outside driver. It's best suited for things like RESTful resources, REST services (don't even get
+   me started on that name), GraphQL - you name it. Anything that doesn't have a pretty user interface but does have one that can be easily exercised by machines is a 
+   good candidate for integration testing
+3. End-to-end tests - written in all kinds of tools for simulating users. For web applications one of the more popular tools is Selenium with all kinds of things
+   on top of it. Recently tools like Cypress are gaining popularity as well.
+4. End-to-end manual tests - written as plain-text scenarios driven by testers. There is a plethora of ways those can be structured but the goal here is that other
+   human beings can read and understand what needs to be typed in and where to click to get things validated.
+5. Behavioral tests - theoretically those are tests that are automated and non-technical people can edit them in the form of a wiki page and tell what kind of results
+   are expected from specified scenarios. Because it involves creation (or extension) of a cucumber-like interface (usually a wiki) and interaction with non-technical
+   people that need to be explained how to use it (and then to get proficient at it) then this is a seldom used type of tests in projects that I have been in.
+6. Performance tests - usually end-to-end tests executed by a set of runners to try to bring the system beyond the expected limits in production.
+7. Security tests - kind of depends on the system in question but if you're working on a public-facing system then those should definitelly be part of the regular
+   application development. There are tools for it that help automate it but the key here is using very smart people that can react to what they see on the screen to
+   trick the system into doing something it has not been protected against.
+
+So what to test and how? When? How often?
+
+Let's start with the obvious: don't test user interface with unit tests. Period. User interface (and web user interface in particular) consists of more than just the
+javascript code and DOM tree for it to make sense to be unit tested at all. All kinds of React/Vue/Angular recipes for testing components are in my personal opinion
+complete nonsense. There should be no logic in those components, it should be extracted to a services layer and that layer can and should be tested.
+However, not all services are to be tested with unit tests! Those ones that connect to outside world should still connect to outside world and should be integration-tested.
+Those very few ones that are self-contained are the perfect candidates for unit tests. Take a calculation service for example. That service gets all the data (much like
+a pure function does) and spits out some kind of result. That is LOGIC that can and should be UNIT TESTED. Everything else goes into integration tests.
+
+In my experience 20% unit test coverage for a CMS-style application is already too much. 50% of integration tests is an overkill.
+
+Software systems are primarily created to help people (and or companies of people) to solve their problems. This means that it will be mostly people interacting with your
+systems. Therefore there should be no surprise that in a lot of companies the set of people clicking the system through and through (sometimes called "full regression")
+to make sure it actually works.
+
+The place where we can win the most is to automate away those people. Yes, automate-away! They are doing manual things that are easy to automate and extremely repeatable.
+And where there are repeatable things being done by humans there is potential for... mistakes! So the manual testing is by the very definition error prone.
+
+As for automating end-to-end tests please, please PLEASE use the page/component-object pattern! Please make sure that you write tests as if they would (because they are)
+integral parts of the system and as such they deserve the same level of care and discipline as the code being tested.
+
+And do test your coverage in this case as well! 95% of all business cases is a safe bet. Do test errors! They are an integral part of your application!
+
+In the end let's not forget that it is just a matter of time before what has not been automated is going to be verified by real users. One way or the other your system
+will be battle-tested.
+
+
+Now the situation I have just described is turned completely upside-down when you're working on a library rather than the end-user application. Why?
+
+First of all the users of your code are no longer end-users but developers that will probably push your code to the very limits of your imagination!
+
+And above all else - you probably won't have any QA resources other than yourself and your collegues working hard on maintaining the library and/or framework. This means
+more/less that if you don't automate away everything there is you're basically begging for trouble. And when I say "everything" I don't mean just testing but things
+like publishing, generating changelog, testing on all possible levels, CI to bind it all together and god knows what else. That is, of course, if you want to keep
+the project alive.
+
+In the case of a library there's most probably a lot more working code than plumbing commonly found in end-user applications that are using libs and frameworks.
+
+Also the mindset when writing libraries and frameworks for other developers to use needs to be quite different: you're no longer guessing what the user wants but you are
+yourself giving a set of choices for the user to benefit from. Your domain is shifted radically and in almost all cases that domain is technical enough to justify
+TDD and other highly technical approaches resulting in highly maintainable and unit-test testable code. It is simply a different type of code: reusable code.
+
+In the case of successful libraries the percentage of unit tests is usually around 85-90 percent, there are usually little to no end-to-end tests (there is no app
+to test!) and the set of integration tests depends on the type of the product you work on. In the case of libraries for accessing external resources those tests will
+still make up 80% of all tests for obvious reasons. However in the case of visual component libraries unit tests will form the absolute majority as everything is ligically
+separate and thus easy to unit-test.
+
+
+As you have seen the amount and type of testing largely depends on the project. It is very often that end-user products have libraries of components embedded in them.
+That's all-round bad and things like that should (at the very least logically) be separated and proper testing strategies should be used to keep the project maintainable.
+I have seen way too many applications that have crumbled developer's productivity (and will to live) by an excessive unit test suite striving to keep the coverage
+at 80+ percent. At the same time lots of projects have strived and are still in very good shape without any unit tests at all but with either very dedicated team of
+manual testers or properly written suite of end-to-end tests. Pick the right approach, don't hinder your productive capacity with waste code, test what needs to be tested
+and don't get cought up in line and branch coverage by unit tests. That's a one-way ticket to low performance and lost focus on what is really important: delivering value
+to the client.
+
+
+Thank you!
+
